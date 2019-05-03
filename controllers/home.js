@@ -2,59 +2,64 @@ const Header = require('../models/header')
 const Subheader = require('../models/subheader')
 const Countries = require('../models/countries')
 const Experience = require('../models/experience')
+const Messages = require('../utils/messages')
 
-function getHeader(req, res) {
-  Header.find({}, (err, header) => {
-    if (err) return res.status(500).send({message: `Error al realizar la petición: ${err}`})
-    if (!header) return res.status(404).send({message: 'No existen productos'})
+const getModel = (Component, res) => {
+  Component.find({}, (error, component) => {
+    if (error) {
+      return Messages.errorInSave(res, error)
+    }
+    if (!component) {
+      return res.status(404).send({
+        message: 'No existen productos'
+      })
+    }
+    console.log(component);
 
-    res.status(200).send({ header })
+    return res.status(200).send(component[0])
   })
 }
 
-function setHeader(req, res) {
-  const headerData = new Header(req.query);
+const getHeader = (req, res) => getModel(Header, res)
+const getSubheader = (req, res) => getModel(Subheader, res)
+const getCountries = (req, res) => getModel(Countries, res)
+const getExperience = (req, res) => getModel(Experience, res)
+
+const setHeader = (req, res) => {
+  const headerData = new Header(req.query)
   headerData.save()
-    .then(() => {
-      res.status(200).send({ message: 'item saved to database' })
-    })
-    .catch(err => {
-      res.status(400).send('unable to save to database');
-    });
+    .then(() => Messages.correctSave(res))
+    .catch((error) => Messages.unableToSave(res, error))
 }
 
-
-function getSubheader(req, res) {
-  Subheader.find({}, (err, subheader) => {
-    if (err) return res.status(500).send({message: `Error al realizar la petición: ${err}`})
-    if (!subheader) return res.status(404).send({message: 'No existen productos'})
-
-    res.send(200, { subheader })
-  })
+const setSubheader = (req, res) => {
+  const subheaderData = new Subheader(req.query)
+  subheaderData.save()
+    .then(() => Messages.correctSave(res))
+    .catch((error) => Messages.unableToSave(res, error))
 }
+const setCountries = () => {
+  const countriesData = new Countries(req.query)
 
-function getCountries(req, res) {
-  Countries.find({}, (err, countries) => {
-    if (err) return res.status(500).send({message: `Error al realizar la petición: ${err}`})
-    if (!countries) return res.status(404).send({message: 'No existen productos'})
-
-    res.send(200, { countries })
-  })
+  countriesData.save()
+    .then(() => Messages.correctSave(res))
+    .catch(() => Messages.unableToSave(res, error))
 }
+const setExperience = () => {
+  const experienceData = new Experience(req.query)
 
-function getExperience(req, res) {
-  Experience.find({}, (err, experience) => {
-    if (err) return res.status(500).send({message: `Error al realizar la petición: ${err}`})
-    if (!experience) return res.status(404).send({message: 'No existen productos'})
-
-    res.send(200, { experience })
-  })
+  experienceData.save()
+    .then(() => Messages.correctSave(res))
+    .catch(() => Messages.unableToSave(res, error))
 }
 
 module.exports = {
   getHeader,
-  setHeader,
   getSubheader,
   getCountries,
   getExperience,
+  setHeader,
+  setSubheader,
+  setCountries,
+  setExperience,
 }
