@@ -15,8 +15,9 @@ const getModel = (Component, res) => {
       })
     }
     console.log(component);
+    const lastItem = component.length -1
 
-    return res.status(200).send(component[0])
+    return res.status(200).send(component[lastItem])
   })
 }
 
